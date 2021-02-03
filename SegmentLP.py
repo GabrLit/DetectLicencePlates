@@ -78,7 +78,7 @@ def init(licencePlate):
 
         if Settings.showSteps["SegmentedChars"] == 1:
             cv2.imshow(("{}{}".format("ch", i)), paddedChar)
-
+            cv2.imwrite(("{}{}.png".format("ch", i)), paddedChar)
         chars.append(paddedChar)
         i = i + 1
 

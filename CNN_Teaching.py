@@ -30,7 +30,7 @@ def recognise():
             currentImg = cv2.imread(path)
             currentImg = cv2.resize(currentImg, (32, 32))
             images.append(currentImg)
-            labels.append(l)
+            labels.append(int(l))
         print(l, end=" ")
     print()
     print("Import Completed...")
@@ -91,9 +91,10 @@ def recognise():
     model = myModel(noOfLabels)
     print(model.summary())
 
-    BATCH_SIZE = 32
+    BATCH_SIZE = 64
     EPOCHS = 50
-    STEPS_PER_EPOCH = X_train.shape[0]//BATCH_SIZE
+    STEPS_PER_EPOCH = X_train.shape[0] // BATCH_SIZE
+    # STEPS_PER_EPOCH= 10
 
     history = model.fit_generator(dataGen.flow(X_train, y_train, batch_size=BATCH_SIZE),
                                   steps_per_epoch=STEPS_PER_EPOCH,
@@ -116,15 +117,12 @@ def recognise():
     plt.xlabel('epoch')
 
     plt.show()
-    score= model.evaluate(X_test, y_test, verbose=0)
+    score = model.evaluate(X_test, y_test, verbose=0)
     print('Test Score = ', score[0])
     print('Accuracy = ', score[1])
 
     model.save("myModel")
-
-    #pickle_out=open("model_trained.p","wb")
-    #pickle.dump((model, pickle_out))
-    #pickle_out.close()
+    print("Saved model to disk")
 
     return 0
 
@@ -137,28 +135,36 @@ def preprocessing(img):
 
 
 def myModel(noOfLabels):
-    noOfFilters = 80
-    sizeOfFilter1 = (5, 5)
-    sizeOfFilter2 = (3, 3)
-    sizeOfPool = (2, 2)
-    noOfNode = 1000
 
     model = Sequential()
-    model.add((Conv2D(noOfFilters, sizeOfFilter1, input_shape=(32, 32, 1), activation='relu')))
-    model.add((Conv2D(noOfFilters, sizeOfFilter1, activation='relu')))
-    model.add(Conv2D(noOfFilters, sizeOfFilter1, activation='relu'))
-    model.add(MaxPooling2D(pool_size=sizeOfPool))
-    model.add(Conv2D(noOfFilters // 2, sizeOfFilter2, activation='relu'))
-    model.add(Conv2D(noOfFilters // 2, sizeOfFilter2, activation='relu'))
-    model.add(Conv2D(noOfFilters // 2, sizeOfFilter2, activation='relu'))
-    model.add(MaxPooling2D(pool_size=sizeOfPool))
-    model.add(Dropout(0.5))
-
+    # CONVOLUTIONAL LAYER
+    model.add(Conv2D(filters=32, kernel_size=(3, 3), input_shape=(32, 32, 1), activation='relu'))
+    model.add(MaxPool2D(pool_size=(2, 2), strides=(2, 2)))
+    model.add(Conv2D(filters=64, kernel_size=(3, 3), activation='relu'))
+    model.add(MaxPool2D(pool_size=(2, 2)))
+    # FLATTEN IMAGES FROM 28 by 28 to 764 BEFORE FINAL LAYER
     model.add(Flatten())
-    model.add(Dense(noOfNode, activation='relu'))
+    # 128 NEURONS IN DENSE HIDDEN LAYER
+    model.add(Dense(256, activation='relu'))
     model.add(Dropout(0.5))
     model.add(Dense(noOfLabels, activation='softmax'))
-    model.compile(Adam(lr=0.001), loss='categorical_crossentropy', metrics=['accuracy'])
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+    # model.add((Conv2D(noOfFilters, sizeOfFilter1, input_shape=(32, 32, 1), activation='relu')))
+    # model.add((Conv2D(noOfFilters, sizeOfFilter1, activation='relu')))
+    # model.add(Conv2D(noOfFilters, sizeOfFilter1, activation='relu'))
+    # model.add(MaxPooling2D(pool_size=sizeOfPool))
+    # model.add(Conv2D(noOfFilters // 2, sizeOfFilter2, activation='relu'))
+    # model.add(Conv2D(noOfFilters // 2, sizeOfFilter2, activation='relu'))
+    # model.add(Conv2D(noOfFilters // 2, sizeOfFilter2, activation='relu'))
+    # model.add(MaxPooling2D(pool_size=sizeOfPool))
+    # model.add(Dropout(0.5))
+    #
+    # model.add(Flatten())
+    # model.add(Dense(noOfNode, activation='relu'))
+    # model.add(Dropout(0.5))
+    # model.add(Dense(noOfLabels, activation='softmax'))
+    # model.compile(Adam(lr=0.001), loss='categorical_crossentropy', metrics=['accuracy'])
 
     return model
 

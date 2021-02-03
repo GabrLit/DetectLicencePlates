@@ -1,15 +1,15 @@
 def init():
     global showSteps
 
-    Original=0
-    GrayScale=0
-    Binary=0
-    EarlyCandidates=0
-    CharSets=0
+    Original=1
+    GrayScale=1
+    Binary=1
+    EarlyCandidates=1
+    CharSets=1
     LPCandidates=0
-    LPGrayScale=0
-    LPBinary=0
-    LPContours=0
+    LPGrayScale=1
+    LPBinary=1
+    LPContours=1
     SegmentedChars=0
 
     showSteps = {

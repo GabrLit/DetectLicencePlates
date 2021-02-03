@@ -103,6 +103,7 @@ def init(image):
         if licencePlate is not None:
             licencePlates.append(licencePlate)  # add to list of possible plates
 
+
     if Settings.showSteps["LPCandidates"] == 1:
         print("Found: {} candidates for licence plates".format(len(licencePlates)))
         for licencePlate in licencePlates:
